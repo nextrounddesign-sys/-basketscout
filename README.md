@@ -66,3 +66,9 @@ Receipt import + structured verified price observations, then the one-store / tw
 ## v0.5.2
 - Removed the duplicate bottom `View list` / `Compare prices` bar.
 - The sticky action bar below search/categories is now the single primary action bar.
+
+
+## v0.5.3
+- Fixed startup JavaScript error caused by references to the removed duplicate bottom action bar.
+- Categories and groceries now render immediately on page load.
+- Search continues to search across all categories.
