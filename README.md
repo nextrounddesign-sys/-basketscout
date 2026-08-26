@@ -1,4 +1,4 @@
-# BasketScout — East Stroudsburg Alpha v0.4
+# BasketScout — East Stroudsburg Alpha v0.4.1
 
 Mobile-first grocery comparison proof of concept.
 
@@ -46,3 +46,10 @@ Receipt import + structured verified price observations, then the one-store / tw
 - Selected groceries open in a mobile bottom sheet instead of appearing after all 254 groceries.
 - Comparison results open in a bottom sheet instead of requiring a long page scroll.
 - Receipt upload is collapsible to reduce clutter while building a list.
+
+
+## v0.4.1 UX fix
+- Adds a visible View list / Compare prices action bar directly below search/categories.
+- The action bar stays sticky near the top while browsing groceries.
+- Keeps the bottom fixed bar as a secondary convenience.
+- Adds cache-busting query strings to local CSS/JS/data assets so GitHub Pages/Safari load the newest files after deploy.

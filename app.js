@@ -19,6 +19,7 @@ const els = {
   compareBtn: document.querySelector('#compareBtn'), compareFromListBtn: document.querySelector('#compareFromListBtn'),
   results: document.querySelector('#results'), stickyActions: document.querySelector('#stickyActions'),
   stickyCount: document.querySelector('#stickyCount'), viewListBtn: document.querySelector('#viewListBtn'),
+  topCount: document.querySelector('#topCount'), viewListTopBtn: document.querySelector('#viewListTopBtn'), compareTopBtn: document.querySelector('#compareTopBtn'),
   listDialog: document.querySelector('#listDialog'), resultsDialog: document.querySelector('#resultsDialog'),
   closeListBtn: document.querySelector('#closeListBtn'), closeResultsBtn: document.querySelector('#closeResultsBtn'),
   clearListBtn: document.querySelector('#clearListBtn'),
@@ -92,6 +93,7 @@ function renderSelected(){
   els.itemCount.textContent=`${selected.length} selected`;
   els.unitCount.textContent=`${units} item${units===1?'':'s'}`;
   els.stickyCount.textContent=units;
+  els.topCount.textContent=units;
   els.stickyActions.classList.toggle('hidden',!selected.length);
   els.selectedList.innerHTML='';
   selected.forEach(g=>els.selectedList.appendChild(makeSelectedRow(g)));
@@ -116,8 +118,11 @@ function compare(){
 function render(){renderStats();renderCategories();renderGroceries();renderSelected();}
 els.search.addEventListener('input',e=>{state.query=e.target.value;renderGroceries();});
 els.compareBtn.addEventListener('click',compare);
+els.compareTopBtn.addEventListener('click',compare);
 els.compareFromListBtn.addEventListener('click',compare);
-els.viewListBtn.addEventListener('click',()=>{ if(!els.listDialog.open) els.listDialog.showModal(); });
+const openList=()=>{ if(!els.listDialog.open) els.listDialog.showModal(); };
+els.viewListBtn.addEventListener('click',openList);
+els.viewListTopBtn.addEventListener('click',openList);
 els.closeListBtn.addEventListener('click',()=>els.listDialog.close());
 els.closeResultsBtn.addEventListener('click',()=>els.resultsDialog.close());
 els.clearListBtn.addEventListener('click',()=>{state.quantities={};state.brands={};save();render();});
