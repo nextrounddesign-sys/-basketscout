@@ -15,9 +15,13 @@ const state = {
 const els = {
   search: document.querySelector('#search'), categories: document.querySelector('#categories'),
   groceryList: document.querySelector('#groceryList'), itemCount: document.querySelector('#itemCount'),
-  selectedSection: document.querySelector('#selectedSection'), selectedList: document.querySelector('#selectedList'),
-  unitCount: document.querySelector('#unitCount'), compareBtn: document.querySelector('#compareBtn'),
-  resultsSection: document.querySelector('#resultsSection'), results: document.querySelector('#results'),
+  selectedList: document.querySelector('#selectedList'), unitCount: document.querySelector('#unitCount'),
+  compareBtn: document.querySelector('#compareBtn'), compareFromListBtn: document.querySelector('#compareFromListBtn'),
+  results: document.querySelector('#results'), stickyActions: document.querySelector('#stickyActions'),
+  stickyCount: document.querySelector('#stickyCount'), viewListBtn: document.querySelector('#viewListBtn'),
+  listDialog: document.querySelector('#listDialog'), resultsDialog: document.querySelector('#resultsDialog'),
+  closeListBtn: document.querySelector('#closeListBtn'), closeResultsBtn: document.querySelector('#closeResultsBtn'),
+  clearListBtn: document.querySelector('#clearListBtn'),
   clearBtn: document.querySelector('#clearBtn'), rowTemplate: document.querySelector('#rowTemplate'),
   selectedRowTemplate: document.querySelector('#selectedRowTemplate'), catalogStat: document.querySelector('#catalogStat'),
   storeStat: document.querySelector('#storeStat'), priceStat: document.querySelector('#priceStat'), storeLine: document.querySelector('#storeLine'),
@@ -84,30 +88,41 @@ function renderGroceries(){
 
 function renderSelected(){
   const selected=groceries.filter(g=>qty(g.id)>0);
-  const units=selected.reduce((s,g)=>s+qty(g.id),0);
+  const units=selected.reduce((sum,g)=>sum+qty(g.id),0);
   els.itemCount.textContent=`${selected.length} selected`;
   els.unitCount.textContent=`${units} item${units===1?'':'s'}`;
-  els.selectedSection.classList.toggle('hidden',!selected.length);
-  els.selectedList.innerHTML=''; selected.forEach(g=>els.selectedList.appendChild(makeSelectedRow(g)));
-  if(!selected.length) els.resultsSection.classList.add('hidden');
+  els.stickyCount.textContent=units;
+  els.stickyActions.classList.toggle('hidden',!selected.length);
+  els.selectedList.innerHTML='';
+  selected.forEach(g=>els.selectedList.appendChild(makeSelectedRow(g)));
+  if(!selected.length){
+    if(els.listDialog.open) els.listDialog.close();
+    if(els.resultsDialog.open) els.resultsDialog.close();
+  }
 }
 
 function compare(){
   const selected=groceries.filter(g=>qty(g.id)>0);
   els.results.innerHTML='';
   if(!data.priceObservations.length){
-    els.results.innerHTML=`<div class="data-empty"><strong>Ready for real price data</strong><p>Your list has ${selected.length} grocery type${selected.length===1?'':'s'}, but BasketScout does not have verified local price observations yet.</p><p>Mock prices were removed in v0.2. The next data milestone is receipt import and verified price records.</p></div>`;
+    els.results.innerHTML=`<div class="data-empty"><strong>Ready for real price data</strong><p>Your list has ${selected.length} grocery type${selected.length===1?'':'s'}, but BasketScout does not have verified local price observations yet.</p><p>Once receipt data is available, this screen will show the cheapest single-store, two-store, and overall plans.</p></div>`;
   } else {
     els.results.innerHTML='<div class="data-empty">Price optimizer will use verified observations here.</div>';
   }
-  els.resultsSection.classList.remove('hidden');
-  els.resultsSection.scrollIntoView({behavior:'smooth',block:'start'});
+  if(els.listDialog.open) els.listDialog.close();
+  if(!els.resultsDialog.open) els.resultsDialog.showModal();
 }
 
 function render(){renderStats();renderCategories();renderGroceries();renderSelected();}
 els.search.addEventListener('input',e=>{state.query=e.target.value;renderGroceries();});
 els.compareBtn.addEventListener('click',compare);
-els.clearBtn.addEventListener('click',()=>{state.quantities={};state.brands={};save();els.resultsSection.classList.add('hidden');render();});
+els.compareFromListBtn.addEventListener('click',compare);
+els.viewListBtn.addEventListener('click',()=>{ if(!els.listDialog.open) els.listDialog.showModal(); });
+els.closeListBtn.addEventListener('click',()=>els.listDialog.close());
+els.closeResultsBtn.addEventListener('click',()=>els.resultsDialog.close());
+els.clearListBtn.addEventListener('click',()=>{state.quantities={};state.brands={};save();render();});
+els.clearBtn.addEventListener('click',()=>{state.quantities={};state.brands={};save();if(els.listDialog.open)els.listDialog.close();if(els.resultsDialog.open)els.resultsDialog.close();render();});
+[els.listDialog, els.resultsDialog].forEach(dialog=>dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();}));
 render();
 
 

@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div><div class="eyebrow">East Stroudsburg, PA · alpha v0.3</div><h1>BasketScout</h1></div>
+    <div><div class="eyebrow">East Stroudsburg, PA · alpha v0.4</div><h1>BasketScout</h1></div>
     <button id="clearBtn" class="ghost">Clear</button>
   </header>
   <main>
@@ -19,13 +19,15 @@
       <span id="priceStat"></span>
     </section>
 
-    <section class="receipt-card">
-      <div class="section-head"><h2>Upload receipt</h2><span id="authStatus">Connecting…</span></div>
-      <p class="helper">Upload a grocery receipt photo or PDF. For now this securely stores the receipt and creates its database record; automatic item reading comes next.</p>
-      <input id="receiptFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.pdf" />
-      <button id="uploadReceiptBtn" class="primary" disabled>Upload receipt</button>
-      <div id="uploadStatus" class="upload-status hidden" aria-live="polite"></div>
-    </section>
+    <details class="receipt-card receipt-details">
+      <summary><span>Upload receipt</span><small id="authStatus">Connecting…</small></summary>
+      <div class="receipt-body">
+        <p class="helper">Upload a grocery receipt photo or PDF. For now this securely stores the receipt and creates its database record; automatic item reading comes next.</p>
+        <input id="receiptFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.pdf" />
+        <button id="uploadReceiptBtn" class="primary" disabled>Upload receipt</button>
+        <div id="uploadStatus" class="upload-status hidden" aria-live="polite"></div>
+      </div>
+    </details>
 
     <section class="search-wrap">
       <input id="search" type="search" placeholder="Search groceries…" autocomplete="off" />
@@ -37,19 +39,33 @@
       <div id="groceryList" class="list"></div>
     </section>
 
-    <section id="selectedSection" class="selected-card hidden">
-      <div class="section-head"><h2>Your list</h2><span id="unitCount">0 items</span></div>
-      <p class="helper">Brand is optional. Leave it as <strong>Any brand</strong> and BasketScout will eventually choose the cheapest qualifying product.</p>
-      <div id="selectedList"></div>
-      <button id="compareBtn" class="primary">Compare local prices</button>
-      <p class="fineprint" id="storeLine"></p>
-    </section>
-
-    <section id="resultsSection" class="results hidden">
-      <div class="section-head"><h2>Shopping plan</h2><span>verified data only</span></div>
-      <div id="results"></div>
-    </section>
   </main>
+
+  <div id="stickyActions" class="sticky-actions hidden" aria-live="polite">
+    <button id="viewListBtn" class="secondary-action"><strong id="stickyCount">0</strong><span>View list</span></button>
+    <button id="compareBtn" class="primary-action">Compare prices</button>
+  </div>
+
+  <dialog id="listDialog" class="sheet-dialog">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="section-head sheet-head"><h2>Your list</h2><button id="closeListBtn" class="ghost compact">Done</button></div>
+      <div class="sheet-summary"><span id="unitCount">0 items</span><button id="clearListBtn" class="text-button">Clear list</button></div>
+      <p class="helper">Brand is optional. Leave it as <strong>Any brand</strong> and BasketScout will choose the cheapest qualifying product.</p>
+      <div id="selectedList" class="selected-list-scroll"></div>
+      <button id="compareFromListBtn" class="primary">Compare local prices</button>
+      <p class="fineprint" id="storeLine"></p>
+    </div>
+  </dialog>
+
+  <dialog id="resultsDialog" class="sheet-dialog">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="section-head sheet-head"><h2>Shopping plan</h2><button id="closeResultsBtn" class="ghost compact">Done</button></div>
+      <div class="sheet-summary"><span>Verified data only</span></div>
+      <div id="results"></div>
+    </div>
+  </dialog>
 
   <template id="rowTemplate">
     <div class="row">
