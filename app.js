@@ -7,7 +7,8 @@ const groceries = data.products;
 const stores = data.stores.filter(s => s.active);
 
 const state = {
-  category: 'All', query: '',
+  category: localStorage.getItem('basketScoutCategory') || 'All',
+  query: '',
   quantities: JSON.parse(localStorage.getItem('basketScoutQuantities') || '{}'),
   brands: JSON.parse(localStorage.getItem('basketScoutBrands') || '{}')
 };
@@ -50,8 +51,15 @@ function renderCategories(){
   els.categories.innerHTML='';
   categoryList().forEach(cat=>{
     const b=document.createElement('button');
-    b.className='chip'+(state.category===cat?' active':''); b.textContent=cat;
-    b.onclick=()=>{state.category=cat; renderCategories(); renderGroceries();};
+    b.className='chip'+(state.category===cat?' active':'');
+    b.textContent=cat;
+    b.setAttribute('aria-pressed', state.category===cat ? 'true' : 'false');
+    b.onclick=()=>{
+      state.category=cat;
+      localStorage.setItem('basketScoutCategory', cat);
+      renderCategories();
+      renderGroceries();
+    };
     els.categories.appendChild(b);
   });
 }
@@ -81,7 +89,11 @@ function makeSelectedRow(item){
 
 function renderGroceries(){
   const q=state.query.toLowerCase().trim();
-  const rows=groceries.filter(g=>(state.category==='All'||g.category===state.category) && (!q||`${g.name} ${g.unit} ${g.category} ${(g.aliases||[]).join(' ')}`.toLowerCase().includes(q)));
+  const rows=groceries.filter(g=>{
+    const matchesSearch = !q || `${g.name} ${g.unit} ${g.category} ${(g.aliases||[]).join(' ')}`.toLowerCase().includes(q);
+    const matchesCategory = q ? true : (state.category==='All' || g.category===state.category);
+    return matchesSearch && matchesCategory;
+  });
   els.groceryList.innerHTML='';
   if(!rows.length){els.groceryList.innerHTML='<div class="empty">No groceries found.</div>';return;}
   rows.forEach(g=>els.groceryList.appendChild(makeRow(g)));
