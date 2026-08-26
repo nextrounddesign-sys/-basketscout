@@ -3,66 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
   <title>BasketScout Alpha</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <div class="eyebrow">East Stroudsburg, PA alpha</div>
-      <h1>BasketScout</h1>
-    </div>
+    <div><div class="eyebrow">East Stroudsburg, PA · alpha v0.2</div><h1>BasketScout</h1></div>
     <button id="clearBtn" class="ghost">Clear</button>
   </header>
-
   <main>
+    <section class="status-card">
+      <strong id="catalogStat"></strong>
+      <span id="storeStat"></span>
+      <span id="priceStat"></span>
+    </section>
+
     <section class="search-wrap">
       <input id="search" type="search" placeholder="Search groceries…" autocomplete="off" />
       <div id="categories" class="chips"></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>Groceries</h2>
-        <span id="itemCount">0 selected</span>
-      </div>
+      <div class="section-head"><h2>Groceries</h2><span id="itemCount">0 selected</span></div>
       <div id="groceryList" class="list"></div>
     </section>
 
     <section id="selectedSection" class="selected-card hidden">
-      <div class="section-head">
-        <h2>Your list</h2>
-        <span id="unitCount">0 items</span>
-      </div>
+      <div class="section-head"><h2>Your list</h2><span id="unitCount">0 items</span></div>
+      <p class="helper">Brand is optional. Leave it as <strong>Any brand</strong> and BasketScout will eventually choose the cheapest qualifying product.</p>
       <div id="selectedList"></div>
       <button id="compareBtn" class="primary">Compare local prices</button>
-      <p class="fineprint">Alpha stores: GIANT, Walmart, ShopRite, Weis, and ALDI.</p>
+      <p class="fineprint" id="storeLine"></p>
     </section>
 
     <section id="resultsSection" class="results hidden">
-      <div class="section-head">
-        <h2>Example shopping plan</h2>
-        <span>mock data</span>
-      </div>
+      <div class="section-head"><h2>Shopping plan</h2><span>verified data only</span></div>
       <div id="results"></div>
-      <p class="warning">Prices below are placeholders only. The next development step is connecting verified local price/deal records.</p>
     </section>
   </main>
 
   <template id="rowTemplate">
     <div class="row">
-      <div class="item-info">
-        <strong class="item-name"></strong>
-        <span class="item-meta"></span>
-      </div>
-      <div class="stepper">
-        <button class="minus" aria-label="Decrease">−</button>
-        <span class="qty">0</span>
-        <button class="plus" aria-label="Increase">+</button>
-      </div>
+      <div class="item-info"><strong class="item-name"></strong><span class="item-meta"></span></div>
+      <div class="stepper"><button class="minus" aria-label="Decrease">−</button><span class="qty">0</span><button class="plus" aria-label="Increase">+</button></div>
     </div>
   </template>
 
+  <template id="selectedRowTemplate">
+    <div class="selected-row">
+      <div class="selected-row-top">
+        <div class="item-info"><strong class="item-name"></strong><span class="item-meta"></span></div>
+        <div class="stepper"><button class="minus" aria-label="Decrease">−</button><span class="qty">0</span><button class="plus" aria-label="Increase">+</button></div>
+      </div>
+      <label class="brand-label">Brand preference
+        <input class="brand-input" type="text" placeholder="Any brand" autocomplete="off" />
+      </label>
+    </div>
+  </template>
+
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
