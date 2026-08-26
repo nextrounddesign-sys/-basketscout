@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div><div class="eyebrow">East Stroudsburg, PA · alpha v0.2</div><h1>BasketScout</h1></div>
+    <div><div class="eyebrow">East Stroudsburg, PA · alpha v0.3</div><h1>BasketScout</h1></div>
     <button id="clearBtn" class="ghost">Clear</button>
   </header>
   <main>
@@ -17,6 +17,14 @@
       <strong id="catalogStat"></strong>
       <span id="storeStat"></span>
       <span id="priceStat"></span>
+    </section>
+
+    <section class="receipt-card">
+      <div class="section-head"><h2>Upload receipt</h2><span id="authStatus">Connecting…</span></div>
+      <p class="helper">Upload a grocery receipt photo or PDF. For now this securely stores the receipt and creates its database record; automatic item reading comes next.</p>
+      <input id="receiptFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.pdf" />
+      <button id="uploadReceiptBtn" class="primary" disabled>Upload receipt</button>
+      <div id="uploadStatus" class="upload-status hidden" aria-live="polite"></div>
     </section>
 
     <section class="search-wrap">
@@ -62,6 +70,7 @@
     </div>
   </template>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>

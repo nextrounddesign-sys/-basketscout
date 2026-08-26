@@ -1,8 +1,8 @@
-# BasketScout — East Stroudsburg Alpha v0.2
+# BasketScout — East Stroudsburg Alpha v0.3
 
 Mobile-first grocery comparison proof of concept.
 
-## v0.2 changes
+## v0.3 changes
 - Expanded generic grocery catalog to **254 items**.
 - Added optional brand preference per selected grocery.
 - Added structured `data.js` model for products, stores, price observations, promotions, and coupons.
@@ -29,3 +29,13 @@ Every future price observation should contain a product/store reference, price, 
 
 ## Next milestone
 Receipt import + structured verified price observations, then the one-store / two-store / cheapest-overall optimizer.
+
+
+## v0.3 receipt upload milestone
+- Connects to the BasketScout Supabase project using the publishable client key.
+- Creates/persists an anonymous Supabase session in the browser.
+- Accepts JPG, PNG, WEBP, HEIC/HEIF, and PDF receipt files up to 15 MB.
+- Calls the authenticated `upload-receipt` Edge Function.
+- Receipt files remain in the private `receipts` bucket.
+- Successful uploads create a `receipt_uploads` database row.
+- OCR/item extraction is intentionally not implemented yet; upload plumbing is tested first.

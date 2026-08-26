@@ -1,3 +1,7 @@
+const SUPABASE_URL = 'https://nusoidhurmlunvuuzycy.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_-hwik_1dNnC9gedbAbls4A__-JM8qw3';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
 const data = window.BasketScoutData;
 const groceries = data.products;
 const stores = data.stores.filter(s => s.active);
@@ -16,7 +20,9 @@ const els = {
   resultsSection: document.querySelector('#resultsSection'), results: document.querySelector('#results'),
   clearBtn: document.querySelector('#clearBtn'), rowTemplate: document.querySelector('#rowTemplate'),
   selectedRowTemplate: document.querySelector('#selectedRowTemplate'), catalogStat: document.querySelector('#catalogStat'),
-  storeStat: document.querySelector('#storeStat'), priceStat: document.querySelector('#priceStat'), storeLine: document.querySelector('#storeLine')
+  storeStat: document.querySelector('#storeStat'), priceStat: document.querySelector('#priceStat'), storeLine: document.querySelector('#storeLine'),
+  authStatus: document.querySelector('#authStatus'), receiptFile: document.querySelector('#receiptFile'),
+  uploadReceiptBtn: document.querySelector('#uploadReceiptBtn'), uploadStatus: document.querySelector('#uploadStatus')
 };
 
 function save(){
@@ -103,3 +109,99 @@ els.search.addEventListener('input',e=>{state.query=e.target.value;renderGroceri
 els.compareBtn.addEventListener('click',compare);
 els.clearBtn.addEventListener('click',()=>{state.quantities={};state.brands={};save();els.resultsSection.classList.add('hidden');render();});
 render();
+
+
+function setUploadStatus(message, type='info'){
+  els.uploadStatus.textContent = message;
+  els.uploadStatus.className = `upload-status ${type}`;
+}
+
+async function ensureAnonymousSession(){
+  try {
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    let session = sessionData.session;
+    if (!session) {
+      const { data, error } = await supabaseClient.auth.signInAnonymously();
+      if (error) throw error;
+      session = data.session;
+    }
+
+    if (!session) throw new Error('Could not create an anonymous session.');
+    els.authStatus.textContent = 'Secure session ready';
+    els.uploadReceiptBtn.disabled = !els.receiptFile.files.length;
+    return session;
+  } catch (error) {
+    console.error('Anonymous auth failed:', error);
+    els.authStatus.textContent = 'Connection failed';
+    setUploadStatus(`Could not start a secure session: ${error.message}`, 'error');
+    els.uploadReceiptBtn.disabled = true;
+    return null;
+  }
+}
+
+els.receiptFile.addEventListener('change', () => {
+  const file = els.receiptFile.files[0];
+  if (!file) {
+    els.uploadReceiptBtn.disabled = true;
+    els.uploadStatus.classList.add('hidden');
+    return;
+  }
+
+  const maxSize = 15 * 1024 * 1024;
+  if (file.size > maxSize) {
+    setUploadStatus('That file is larger than 15 MB. Choose a smaller receipt file.', 'error');
+    els.uploadReceiptBtn.disabled = true;
+    return;
+  }
+
+  setUploadStatus(`${file.name} ready to upload.`, 'info');
+  els.uploadReceiptBtn.disabled = false;
+});
+
+els.uploadReceiptBtn.addEventListener('click', async () => {
+  const file = els.receiptFile.files[0];
+  if (!file) return;
+
+  els.uploadReceiptBtn.disabled = true;
+  els.uploadReceiptBtn.textContent = 'Uploading…';
+  setUploadStatus('Sending receipt securely…', 'info');
+
+  try {
+    const session = await ensureAnonymousSession();
+    if (!session) throw new Error('No secure session is available.');
+
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    const { data, error } = await supabaseClient.functions.invoke('upload-receipt', {
+      body: formData,
+    });
+
+    if (error) {
+      let detail = error.message || 'Upload failed.';
+      if (error.context) {
+        try {
+          const body = await error.context.json();
+          if (body?.error) detail = body.error;
+        } catch (_) {}
+      }
+      throw new Error(detail);
+    }
+
+    if (!data?.success) throw new Error(data?.error || 'Upload did not complete.');
+
+    const shortId = data.receipt?.id ? data.receipt.id.slice(0,8) : 'saved';
+    setUploadStatus(`Receipt uploaded successfully. Receipt ID: ${shortId}.`, 'success');
+    els.receiptFile.value = '';
+  } catch (error) {
+    console.error('Receipt upload failed:', error);
+    setUploadStatus(`Upload failed: ${error.message}`, 'error');
+  } finally {
+    els.uploadReceiptBtn.textContent = 'Upload receipt';
+    els.uploadReceiptBtn.disabled = !els.receiptFile.files.length;
+  }
+});
+
+ensureAnonymousSession();
